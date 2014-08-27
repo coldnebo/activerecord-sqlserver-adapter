@@ -352,7 +352,13 @@ module ActiveRecord
 
         def views_real_column_name(table_name, column_name)
           view_definition = schema_cache.view_information(table_name)[:VIEW_DEFINITION]
-          match_data = view_definition.match(/([\w-]*)\s+as\s+#{column_name}/im)
+          match_data = nil
+          begin
+            match_data = view_definition.match(/([\w-]*)\s+as\s+#{column_name}/im)
+          rescue
+            warn "No view definition found, possible permissions problem.\nPlease run GRANT VIEW DEFINITION TO your_user;"
+          end
+
           match_data ? match_data[1] : column_name
         end
 
